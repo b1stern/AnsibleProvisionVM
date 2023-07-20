@@ -1,3 +1,4 @@
+---
 - name: Create a virtual machine on given ESXi hostname
   vmware_guest:
     hostname: "{{ vcenter_hostname }}"
