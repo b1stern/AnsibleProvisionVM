@@ -17,7 +17,7 @@
         cluster: X3750
         networks:
           - name: VM Network
-            ip: "{{ ip_addr }} "
+            ip: "{{ ip_addr }}"
             netmask: 255.255.255.0
         wait_for_ip_address: True
         customization:
