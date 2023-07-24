@@ -10,7 +10,7 @@
       password: "{{ vcenter_pass }}"
       validate_certs: False
       name: web02
-      template: rh84-01
+      template: rh84-02
       datacenter: RTP
       folder: /Demo
       cluster: "{{ cluster_name }}"
