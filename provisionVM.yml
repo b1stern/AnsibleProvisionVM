@@ -1,22 +1,41 @@
 ---
-- hosts: all
-  connection: ssh
-  gather_facts: no
-  tasks:
-    - name: Capture all vars on remote host
-      set_fact:
-        all_vars: "{{ hostvars[inventory_hostname] }}"
-    - name: Print hostname
-      command: hostname
-    # - name: Print vars to file on remote host
-    #   copy:
-    #     content: "{{ all_vars | to_nice_yaml }}"
-    #     dest: "/tmp/printed_vars_step_3.yml"
-    # - name: Write hostname to file
-    #   copy:
-    #     content: "{{ ansible_hostname }}"
-    #     dest: "/tmp/current_hostname_play.txt"
-    - name: Save test message to a file
-      copy:
-        content: "{{ message }}"
-        dest: "/tmp/{{ filename }}.txt"
+- name: deploy vm from template demo
+  hosts: localhost
+  become: false
+  gather_facts: false
+  collections:
+    - community.vmware
+  pre_tasks:
+    - include_vars: vars.yml
+tasks:
+    - name: create folder
+      vcenter_folder:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter_name: "{{ datacenter }}"
+        folder_name: /RTP/Demo
+        folder_type: vm
+        state: present
+    - name: clone VM
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter }}"
+        cluster: "{{ vcenter_cluster }}"
+        name: "{{ vm_name }}"
+        folder: /RTP/Demo
+        template: "{{ vm_template }}"
+        networks:
+          - name: VM Network
+            ip: "{{ ip_addr }}"
+            netmask: 255.255.255.0
+        wait_for_ip_address: True
+        customization:
+          domain: "{{ guest_domain }}"
+          dns_servers:
+            - 9.42.106.2
+            - 9.42.106.3
+          dns_suffix:
+            - tivlab.raleigh.ibm.com
