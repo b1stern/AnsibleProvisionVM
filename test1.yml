@@ -20,7 +20,7 @@
       datacenter: RTP
       folder: /RTP/Demo
       cluster: "{{ cluster_name }}"
-      datastore: "tanzu"
+      datastore: tanzu
       networks:
       - name: VM Network
         ip: 9.37.205.89
