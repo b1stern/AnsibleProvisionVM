@@ -2,12 +2,6 @@
 - hosts: all
   connection: ssh
   gather_facts: no
-  vars:
-    vcenter_server: "vcenter5.tivlab.raleigh.ibm.com"
-    vcenter_user: "administrator@tivlab.raleigh.ibm.com"
-    vcenter_pass: "Ams49test!"
-    datacenter_name: "RTP"
-    cluster_name: "X7350"
   tasks:
   - name: Clone the template
     vmware_guest:
@@ -20,7 +14,7 @@
       datacenter: RTP
       folder: /RTP/Demo
       cluster: "{{ cluster_name }}"
-      datastore: tanzu
+      datastore: "tanzu"
       networks:
       - name: VM Network
         ip: 9.37.205.89
