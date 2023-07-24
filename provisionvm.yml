@@ -11,7 +11,7 @@
         validate_certs: no
         datacenter: "{{ datacenter }}"
         state: present
-        folder: /RTP/Demo
+        folder: /Demo
         template: "{{ template }}"
         name: "{{ vm_name }}"
         cluster: X3750
