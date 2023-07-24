@@ -1,0 +1,38 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars:
+    vcenter_server: "vcenter5.tivlab.raleigh.ibm.com"
+    vcenter_user: "administrator@tivlab.raleigh.ibm.com"
+    vcenter_pass: "Ams49test!"
+    datacenter_name: "RTP"
+    cluster_name: "X7350"
+  tasks:
+  - name: Clone the template
+    vmware_guest:
+      hostname: "{{ vcenter_server }}"
+      username: "{{ vcenter_user }}"
+      password: "{{ vcenter_pass }}"
+      validate_certs: False
+      name: web02
+      template: "rh84-01"
+      datacenter: "RTP"
+      folder: /RTP/Demo
+      cluster: "{{ cluster_name }}"
+      datastore: "tanzu"
+      networks:
+      - name: VM Network
+        ip: 9.37.205.89
+        netmask: 255.255.255.0
+        gateway: 9.37.205.1
+        type: static
+        dns_servers: 9.42.106.2
+      customization:
+        hostname: "web02"
+        dns_servers:
+        - 9.42.106.2
+        - 9.42.106.3
+      state: poweredon
+      wait_for_ip_address: yes
+    delegate_to: localhost
+    
