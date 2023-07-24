@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- hosts: all
+  connection: ssh
   gather_facts: no
   vars:
     vcenter_server: "vcenter5.tivlab.raleigh.ibm.com"
@@ -15,8 +16,8 @@
       password: "{{ vcenter_pass }}"
       validate_certs: False
       name: web02
-      template: "rh84-01"
-      datacenter: "RTP"
+      template: rh84-01
+      datacenter: RTP
       folder: /RTP/Demo
       cluster: "{{ cluster_name }}"
       datastore: "tanzu"
