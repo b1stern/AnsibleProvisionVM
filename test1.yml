@@ -12,7 +12,7 @@
       name: web02
       template: rh84-01
       datacenter: RTP
-      folder: /RTP/Demo
+      folder: /Demo
       cluster: "{{ cluster_name }}"
       datastore: "tanzu"
       networks:
