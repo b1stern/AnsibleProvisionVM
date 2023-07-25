@@ -2,6 +2,9 @@
 - hosts: all
   connection: ssh
   gather_facts: yes
+  become: yes
+  vars:
+    ssh_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   tasks:
     - name: Install Apache
       apt:
