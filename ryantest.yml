@@ -1,9 +1,29 @@
 ---
 - hosts: all
-  connection: ssh
+  connection: local
   gather_facts: no
   tasks:
-    - name: Debug
-      debug:
-        msg: "Testing"
-      delegate_to: localhost
+    - name: Clone a virtual machine from Linux template and customize
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ datacenter }}"
+        state: present
+        folder: /Demo
+        template: "{{ template }}"
+        name: "{{ vm_name }}"
+        cluster: X3750
+        networks:
+          - name: VM Network
+            ip: "{{ ip_addr }}"
+            netmask: 255.255.255.0
+        wait_for_ip_address: True
+        customization:
+          domain: "{{ guest_domain }}"
+          dns_servers:
+            - 9.42.106.2
+            - 9.42.106.3
+          dns_suffix:
+            - tivlab.raleigh.ibm.com
