@@ -1,0 +1,9 @@
+---
+- hosts: all
+  connection: ssh
+  gather_facts: no
+  tasks:
+    - name: Debug
+      debug:
+        msg: "Testing"
+      delegate_to: localhost
