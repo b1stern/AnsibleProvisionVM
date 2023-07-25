@@ -1,29 +1,29 @@
 ---
 - hosts: all
-  connection: local
-  gather_facts: no
+  connection: ssh
+  gather_facts: yes
   tasks:
-    - name: Clone a virtual machine from Linux template and customize
-      vmware_guest:
-        hostname: "{{ vcenter_hostname }}"
-        username: "{{ vcenter_username }}"
-        password: "{{ vcenter_password }}"
-        validate_certs: no
-        datacenter: "{{ datacenter }}"
+    - name: Install Apache
+      apt:
+        name: apache2
         state: present
-        folder: /Demo
-        template: "{{ template }}"
-        name: "{{ vm_name }}"
-        cluster: X3750
-        networks:
-          - name: VM Network
-            ip: "{{ ip_addr }}"
-            netmask: 255.255.255.0
-        wait_for_ip_address: True
-        customization:
-          domain: "{{ guest_domain }}"
-          dns_servers:
-            - 9.42.106.2
-            - 9.42.106.3
-          dns_suffix:
-            - tivlab.raleigh.ibm.com
+
+    - name: Install MySQL server
+      apt:
+        name: mysql-server
+        state: present
+      ignore_errors: true
+
+    - name: Install PHP and required modules
+      apt:
+        name:
+          - php
+          - php-mysql
+          - libapache2-mod-php
+          - php-cli
+        state: present
+
+    - name: Restart Apache to apply changes
+      service:
+        name: apache2
+        state: restarted
