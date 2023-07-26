@@ -1,0 +1,72 @@
+---
+- hosts: all
+  connection: ssh
+  gather_facts: yes
+  become: yes
+  vars:
+    ssh_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+  tasks:
+    - name: Install EPEL Repo
+      yum:
+        name: epel-release
+        state: present
+
+    - name: Install MySQL community repository
+      yum:
+        name: https://dev.mysql.com/get/mysql80-community-release-el8-1.noarch.rpm
+        state: present
+
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Enable and start Apache service
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
+
+    - name: Install MySQL server
+      yum:
+        name: mysql-community-server
+        state: present
+
+    - name: Enable and start MySQL service
+      systemd:
+        name: mysqld
+        enabled: yes
+        state: started
+
+    - name: Install PHP and modules
+      yum:
+        name:
+          - php
+          - php-mysqlnd
+          - php-cli
+        state: present
+
+    - name: Create styled Hello World index.php
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Hello World!</title>
+              <style>
+                  body {
+                      font-size: 72px;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      height: 100vh;
+                  }
+              </style>
+          </head>
+          <body>
+              Hello, World!
+          </body>
+          </html>
+        dest: /var/www/html/index.php
