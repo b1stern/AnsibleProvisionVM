@@ -1,0 +1,125 @@
+---
+- hosts: all
+  connection: ssh
+  gather_facts: yes
+  become: yes
+  vars:
+    ssh_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+  tasks:
+    - name: Clone a virtual machine from Linux template and customize
+      vmware_guest:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ vcenter_datacenter }}"
+        state: present
+        folder: /Demo
+        template: "{{ vm_template }}"
+        name: "{{ vm_name }}"
+        cluster: "{{ vcenter_cluster }}"
+        networks:
+          - name: VM Network
+            ip: "{{ vm_ip_addr }}"
+            netmask: 255.255.255.0
+        wait_for_ip_address: True
+        customization:
+          domain: "{{ vm_guest_domain }}"
+          dns_servers:
+            - "{{ vcenter_cluster_dns_server_one }}"
+            - "{{ vcenter_cluster_dns_server_two }}"
+          dns_suffix:
+            - "{{ vm_dns_suffix }}"
+      delegate_to: localhost
+    # - name: Capture all vars on localhost
+    #   set_fact:
+    #     all_vars: "{{ hostvars[inventory_hostname] }}"
+    # Dynamically add a new host (where the agent will be installed) to the inventory
+
+    # TODO: update here with vmware fqdn output
+    # - ansible.builtin.add_host:
+    #     name: "{{ fqdn_to_deploy_to }}"
+    #     groups: lamp_install
+    #   changed_when: false
+
+    # The dynamic host as now been created. Pass the required variables to the new remote host.
+    # - name: Set facts if they are defined
+    #   ansible.builtin.set_fact:
+    #     var_name_to_pass: "{{ var_name_to_pass | default(omit) }}"
+    #   delegate_to: "{{ item }}"
+    #   delegate_facts: true
+    #   loop: "{{ groups['lamp_install'] }}"
+# - name: Install LAMP Stack
+#   hosts: lamp_install
+#   # Required in this play to get the ansible_os_family fact to determine the right package manager
+#   gather_facts: yes
+#   vars:
+#     ansible_user: "{{ user }}"
+#     ansible_ssh_pass: "{{ password }}"
+#     # ansible_become_pass: "{{ password }}" uncomment if not using root user
+#   tasks:
+#     - name: Install Apache
+#       yum:
+#         name: httpd
+#         state: present
+
+#     - name: Enable and start Apache service
+#       systemd:
+#         name: httpd
+#         enabled: yes
+#         state: started
+
+#     - name: Install MySQL
+#       yum:
+#         name: "@mysql"
+#         state: present
+
+#     - name: Enable and start MySQL service
+#       systemd:
+#         name: mysqld
+#         enabled: yes
+#         state: started
+
+#     - name: Install PHP
+#       yum:
+#         name:
+#           - php
+#           - php-mysqlnd
+#           - php-cli
+#         state: present
+
+#     - name: Create styled Hello World index.php
+#       copy:
+#         content: |
+#           <!DOCTYPE html>
+#           <html lang="en">
+#           <head>
+#               <meta charset="UTF-8">
+#               <meta name="viewport" content="width=device-width, initial-scale=1.0">
+#               <title>Hello World!</title>
+#               <style>
+#                   body {
+#                       font-size: 72px;
+#                       display: flex;
+#                       justify-content: center;
+#                       align-items: center;
+#                       height: 100vh;
+#                   }
+#               </style>
+#           </head>
+#           <body>
+#               Hello, World!
+#           </body>
+#           </html>
+#         dest: /var/www/html/index.php
+
+#     - name: Update DirectoryIndex to prioritise index.php
+#       ansible.builtin.lineinfile:
+#         path: /etc/httpd/conf/httpd.conf
+#         regexp: "^DirectoryIndex"
+#         line: "    DirectoryIndex index.php index.html"
+
+#     - name: Restart Apache
+#       service:
+#         name: httpd
+#         state: restarted
