@@ -92,3 +92,16 @@
           </body>
           </html>
         dest: /var/www/html/index.php
+
+    - name: Update DirectoryIndex to prioritise index.php
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^DirectoryIndex"
+        line: "    DirectoryIndex index.php index.html"
+      notify:
+        - Restart Apache
+
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted
