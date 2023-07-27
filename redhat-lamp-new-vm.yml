@@ -29,7 +29,6 @@
             - "{{ vcenter_cluster_dns_server_two }}"
           dns_suffix:
             - "{{ vm_dns_suffix }}"
-      delegate_to: localhost
       register: deploy_vm
 
     - name: Print details of new vm
