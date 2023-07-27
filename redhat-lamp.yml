@@ -31,22 +31,12 @@
     ansible_ssh_pass: "{{ password }}"
     # ansible_become_pass: "{{ password }}" uncomment if not using root user
   tasks:
-    - name: Install EPEL Repo
-      dnf:
-        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
-        state: present
-        # bypass error 'Failed to validate GPG signature for epel-release-8-19.el8.noarch' only for testing
-        disable_gpg_check: yes
-
     # - name: Install EPEL Repo
-    #   yum:
-    #     name: epel-release
+    #   dnf:
+    #     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
     #     state: present
-
-    - name: Install MySQL community repository
-      yum:
-        name: https://dev.mysql.com/get/mysql80-community-release-el8-7.noarch.rpm
-        state: present
+        # bypass error 'Failed to validate GPG signature for epel-release-8-19.el8.noarch' only for testing
+        # disable_gpg_check: yes
 
     - name: Install Apache
       yum:
@@ -59,9 +49,9 @@
         enabled: yes
         state: started
 
-    - name: Install MySQL server
+    - name: Install MySQL
       yum:
-        name: mysql-community-server
+        name: @mysql
         state: present
 
     - name: Enable and start MySQL service
@@ -70,7 +60,7 @@
         enabled: yes
         state: started
 
-    - name: Install PHP and modules
+    - name: Install PHP
       yum:
         name:
           - php
