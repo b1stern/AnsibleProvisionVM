@@ -31,6 +31,12 @@
           dns_suffix:
             - "{{ vm_dns_suffix }}"
       delegate_to: localhost
+      register: deploy_vm
+
+    - name: Print details of new vm
+      debug:
+        var: deploy_vm
+
     # - name: Capture all vars on localhost
     #   set_fact:
     #     all_vars: "{{ hostvars[inventory_hostname] }}"
