@@ -35,9 +35,14 @@
     # ansible_become_pass: "{{ password }}" uncomment if not using root user
   tasks:
     - name: Install EPEL Repo
-      yum:
-        name: epel-release
+      dnf:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
         state: present
+
+    # - name: Install EPEL Repo
+    #   yum:
+    #     name: epel-release
+    #     state: present
 
     - name: Install MySQL community repository
       yum:
