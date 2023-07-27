@@ -98,8 +98,6 @@
         path: /etc/httpd/conf/httpd.conf
         regexp: "^DirectoryIndex"
         line: "    DirectoryIndex index.php index.html"
-      notify:
-        - Restart Apache
 
     - name: Restart Apache
       service:
