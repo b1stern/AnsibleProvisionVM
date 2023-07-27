@@ -35,8 +35,8 @@
     #   dnf:
     #     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
     #     state: present
-        # bypass error 'Failed to validate GPG signature for epel-release-8-19.el8.noarch' only for testing
-        # disable_gpg_check: yes
+    # bypass error 'Failed to validate GPG signature for epel-release-8-19.el8.noarch' only for testing
+    # disable_gpg_check: yes
 
     - name: Install Apache
       yum:
@@ -51,7 +51,7 @@
 
     - name: Install MySQL
       yum:
-        name: @mysql
+        name: "@mysql"
         state: present
 
     - name: Enable and start MySQL service
