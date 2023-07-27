@@ -6,11 +6,9 @@
   vars:
     ssh_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   tasks:
-    - name: Capture all vars on localhost
-      set_fact:
-        all_vars: "{{ hostvars[inventory_hostname] }}"
-    - name: Print hostname
-      command: hostname
+    # - name: Capture all vars on localhost
+    #   set_fact:
+    #     all_vars: "{{ hostvars[inventory_hostname] }}"
     # Dynamically add a new host (where the agent will be installed) to the inventory
     - ansible.builtin.add_host:
         name: "{{ hostname_to_deploy_to }}"
@@ -26,7 +24,6 @@
 
 - name: Install LAMP Stack
   hosts: lamp_install
-  remote_user: "{{ user }}"
   # Required in this play to get the ansible_os_family fact to determine the right package manager
   gather_facts: yes
   vars:
@@ -48,7 +45,7 @@
 
     - name: Install MySQL community repository
       yum:
-        name: https://dev.mysql.com/get/mysql80-community-release-el8-1.noarch.rpm
+        name: https://dev.mysql.com/get/mysql80-community-release-el8-7.noarch.rpm
         state: present
 
     - name: Install Apache
