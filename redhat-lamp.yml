@@ -11,14 +11,29 @@
         all_vars: "{{ hostvars[inventory_hostname] }}"
     - name: Print hostname
       command: hostname
-    # - name: Print vars to file on remote host
-    #   copy:
-    #     content: "{{ all_vars | to_nice_yaml }}"
-    #     dest: "/tmp/printed_vars_step_3.yml"
-    # - name: Write hostname to file
-    #   copy:
-    #     content: "{{ ansible_hostname }}"
-    #     dest: "/tmp/current_hostname_play.txt"
+    # Dynamically add a new host (where the agent will be installed) to the inventory
+    - ansible.builtin.add_host:
+        name: "{{ hostname_to_deploy_to }}"
+        groups: lamp_install
+      changed_when: false
+    # The dynamic host as now been created. Pass the required variables to the new remote host.
+    # - name: Set facts if they are defined
+    #   ansible.builtin.set_fact:
+    #     var_name_to_pass: "{{ var_name_to_pass | default(omit) }}"
+    #   delegate_to: "{{ item }}"
+    #   delegate_facts: true
+    #   loop: "{{ groups['lamp_install'] }}"
+
+- name: Install LAMP Stack
+  hosts: lamp_install
+  remote_user: "{{ user }}"
+  # Required in this play to get the ansible_os_family fact to determine the right package manager
+  gather_facts: yes
+  vars:
+    ansible_user: "{{ user }}"
+    ansible_ssh_pass: "{{ password }}"
+    # ansible_become_pass: "{{ password }}" uncomment if not using root user
+  tasks:
     - name: Save test message to a file
       copy:
         content: "test message"
