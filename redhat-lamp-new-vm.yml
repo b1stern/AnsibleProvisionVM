@@ -141,3 +141,14 @@
       service:
         name: httpd
         state: restarted
+
+    # The template has firewalld running so open port 80
+    - name: Open port 80/tcp in the public zone
+      firewalld:
+        zone: public
+        service: http
+        permanent: yes
+        state: enabled
+
+    - name: Reload firewalld to apply changes
+        command: firewall-cmd --reload
