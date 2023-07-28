@@ -5,6 +5,10 @@
   vars:
     ssh_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   tasks:
+    - name: Generate a random 4-character string for webserver vm suffix
+      set_fact:
+        webserver_suffix: "{{ lookup('password', '/dev/null length=4 chars=ascii_letters,digits') }}"
+
     # Create VM
     - name: Clone a virtual machine from Linux template and customize
       vmware_guest:
@@ -16,7 +20,7 @@
         state: present
         folder: /Demo
         template: "{{ vm_template }}"
-        name: "{{ vm_name }}"
+        name: "{{ vm_name }}-{{ webserver_suffix }}"
         cluster: "{{ vcenter_cluster }}"
         networks:
           - name: VM Network
@@ -64,6 +68,13 @@
     ansible_ssh_pass: "{{ webserver_template_password }}"
     # ansible_become_pass: "{{ webserver_template_password }}" uncomment if not using root user
   tasks:
+    - name: Install EPEL Repo
+      dnf:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+        state: present
+        # bypass error 'Failed to validate GPG signature for epel-release-8-19.el8.noarch' only for testing
+        disable_gpg_check: yes
+
     - name: Install Apache
       yum:
         name: httpd
