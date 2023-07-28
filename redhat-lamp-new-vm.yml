@@ -5,6 +5,7 @@
   vars:
     ssh_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   tasks:
+    # Create VM
     - name: Clone a virtual machine from Linux template and customize
       vmware_guest:
         hostname: "{{ vcenter_hostname }}"
@@ -19,7 +20,7 @@
         cluster: "{{ vcenter_cluster }}"
         networks:
           - name: VM Network
-            ip: "{{ vm_ip_addr }}"
+            ip: "{{ vm_ip_addr_webserver }}"
             netmask: 255.255.255.0
         wait_for_ip_address: True
         customization:
@@ -35,16 +36,16 @@
       debug:
         var: deploy_vm
 
+    # For Debugging
     # - name: Capture all vars on localhost
     #   set_fact:
     #     all_vars: "{{ hostvars[inventory_hostname] }}"
     # Dynamically add a new host (where the agent will be installed) to the inventory
 
-    # TODO: update here with vmware fqdn output
-    # - ansible.builtin.add_host:
-    #     name: "{{ fqdn_to_deploy_to }}"
-    #     groups: lamp_install
-    #   changed_when: false
+    - ansible.builtin.add_host:
+        name: "{{ vm_ip_addr_webserver }}"
+        groups: webservers
+      changed_when: false
 
     # The dynamic host as now been created. Pass the required variables to the new remote host.
     # - name: Set facts if they are defined
@@ -53,77 +54,78 @@
     #   delegate_to: "{{ item }}"
     #   delegate_facts: true
     #   loop: "{{ groups['lamp_install'] }}"
-# - name: Install LAMP Stack
-#   hosts: lamp_install
-#   # Required in this play to get the ansible_os_family fact to determine the right package manager
-#   gather_facts: yes
-#   vars:
-#     ansible_user: "{{ user }}"
-#     ansible_ssh_pass: "{{ password }}"
-#     # ansible_become_pass: "{{ password }}" uncomment if not using root user
-#   tasks:
-#     - name: Install Apache
-#       yum:
-#         name: httpd
-#         state: present
 
-#     - name: Enable and start Apache service
-#       systemd:
-#         name: httpd
-#         enabled: yes
-#         state: started
+- name: Install LAMP Stack on new VM
+  hosts: webservers
+  # Required in this play to get the ansible_os_family fact to determine the right package manager
+  gather_facts: yes
+  vars:
+    ansible_user: "{{ webserver_template_user }}"
+    ansible_ssh_pass: "{{ webserver_template_password }}"
+    # ansible_become_pass: "{{ webserver_template_password }}" uncomment if not using root user
+  tasks:
+    - name: Install Apache
+      yum:
+        name: httpd
+        state: present
 
-#     - name: Install MySQL
-#       yum:
-#         name: "@mysql"
-#         state: present
+    - name: Enable and start Apache service
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
 
-#     - name: Enable and start MySQL service
-#       systemd:
-#         name: mysqld
-#         enabled: yes
-#         state: started
+    - name: Install MySQL
+      yum:
+        name: "@mysql"
+        state: present
 
-#     - name: Install PHP
-#       yum:
-#         name:
-#           - php
-#           - php-mysqlnd
-#           - php-cli
-#         state: present
+    - name: Enable and start MySQL service
+      systemd:
+        name: mysqld
+        enabled: yes
+        state: started
 
-#     - name: Create styled Hello World index.php
-#       copy:
-#         content: |
-#           <!DOCTYPE html>
-#           <html lang="en">
-#           <head>
-#               <meta charset="UTF-8">
-#               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-#               <title>Hello World!</title>
-#               <style>
-#                   body {
-#                       font-size: 72px;
-#                       display: flex;
-#                       justify-content: center;
-#                       align-items: center;
-#                       height: 100vh;
-#                   }
-#               </style>
-#           </head>
-#           <body>
-#               Hello, World!
-#           </body>
-#           </html>
-#         dest: /var/www/html/index.php
+    - name: Install PHP
+      yum:
+        name:
+          - php
+          - php-mysqlnd
+          - php-cli
+        state: present
 
-#     - name: Update DirectoryIndex to prioritise index.php
-#       ansible.builtin.lineinfile:
-#         path: /etc/httpd/conf/httpd.conf
-#         regexp: "^DirectoryIndex"
-#         line: "    DirectoryIndex index.php index.html"
+    - name: Create styled message index.php
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>{{ webserver_message }}</title>
+              <style>
+                  body {
+                      font-size: 72px;
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      height: 100vh;
+                  }
+              </style>
+          </head>
+          <body>
+              {{ webserver_message }}
+          </body>
+          </html>
+        dest: /var/www/html/index.php
 
-#     - name: Restart Apache
-#       service:
-#         name: httpd
-#         state: restarted
+    - name: Update DirectoryIndex to prioritise index.php
+      ansible.builtin.lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: "^DirectoryIndex"
+        line: "    DirectoryIndex index.php index.html"
+
+    - name: Restart Apache
+      service:
+        name: httpd
+        state: restarted
