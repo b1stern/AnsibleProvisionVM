@@ -151,4 +151,4 @@
         state: enabled
 
     - name: Reload firewalld to apply changes
-        command: firewall-cmd --reload
+      command: firewall-cmd --reload
