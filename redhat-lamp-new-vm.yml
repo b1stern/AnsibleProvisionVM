@@ -59,9 +59,15 @@
         state: present
         disable_gpg_check: yes
 
-    - name: Install Apache
-      yum:
-        name: httpd
+    - name: Install dependencies
+      dnf:
+        name:
+          - httpd
+          - "@mysql"
+          - python3-mysql
+          - php
+          - php-mysqlnd
+          - php-cli
         state: present
 
     - name: Enable and start Apache service
@@ -70,29 +76,11 @@
         enabled: yes
         state: started
 
-    - name: Install MySQL
-      yum:
-        name: "@mysql"
-        state: present
-
     - name: Enable and start MySQL service
       systemd:
         name: mysqld
         enabled: yes
         state: started
-
-    - name: Install PHP
-      yum:
-        name:
-          - php
-          - php-mysqlnd
-          - php-cli
-        state: present
-
-    - name: Install MySQL python client
-      yum:
-        name: MySQL-python
-        state: present
 
     # At this point you could clone a repo and prep the app
     # For this demo create the app here
