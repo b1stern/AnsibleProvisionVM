@@ -93,7 +93,7 @@
     - name: Create a table for the counter
       mysql_query:
         login_unix_socket: /var/lib/mysql/mysql.sock
-        db: counter_db
+        login_db: counter_db
         query: |
           CREATE TABLE IF NOT EXISTS counter_table (
             id INT AUTO_INCREMENT PRIMARY KEY,
