@@ -27,12 +27,12 @@
     ansible_ssh_pass: "{{ password }}"
     # ansible_become_pass: "{{ password }}" uncomment if not using root user
   tasks:
-    # - name: Install EPEL Repo
-    #   dnf:
-    #     name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
-    #     state: present
-    # bypass error 'Failed to validate GPG signature for epel-release-8-19.el8.noarch' only for testing
-    # disable_gpg_check: yes
+    - name: Install EPEL Repo
+      dnf:
+        name: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm"
+        state: present
+        # bypass error 'Failed to validate GPG signature for epel-release-8-19.el8.noarch' only for testing
+        disable_gpg_check: yes
 
     - name: Install Apache
       yum:
@@ -72,7 +72,7 @@
           <head>
               <meta charset="UTF-8">
               <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              <title>Hello World!</title>
+              <title>{{ webserver_message }}</title>
               <style>
                   body {
                       font-size: 72px;
@@ -84,7 +84,7 @@
               </style>
           </head>
           <body>
-              Hello, World!
+              {{ webserver_message }}
           </body>
           </html>
         dest: /var/www/html/index.php
@@ -99,3 +99,14 @@
       service:
         name: httpd
         state: restarted
+
+    # If the vm has firewalld enabled, open port 80/tcp
+    - name: Open port 80/tcp in the public zone
+      firewalld:
+        zone: public
+        service: http
+        permanent: yes
+        state: enabled
+
+    - name: Reload firewalld to apply changes
+      command: firewall-cmd --reload
