@@ -26,6 +26,7 @@
           - name: VM Network
             ip: "{{ vm_ip_addr_webserver }}"
             netmask: 255.255.255.0
+            gateway: "{{ vm_gateway }}"
         wait_for_ip_address: True
         customization:
           domain: "{{ vm_guest_domain }}"
