@@ -6,6 +6,12 @@
   vars:
     ssh_args: "-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
   tasks:
+    # For Debugging
+    # - name: Capture all vars on localhost
+    #   set_fact:
+    #     all_vars: "{{ hostvars[inventory_hostname] }}"
+    # Dynamically add a new host (where the agent will be installed) to the inventory
+
     - ansible.builtin.add_host:
         name: "{{ fqdn_to_deploy_to }}"
         groups: lamp_install
